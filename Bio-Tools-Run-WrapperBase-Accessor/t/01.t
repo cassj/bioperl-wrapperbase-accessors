@@ -6,12 +6,7 @@ use Bio::Root::Test;
 
 use Bio::Tools::Run::WrapperBase::Accessor;
 
-test_begin(-tests => 26,
-           -requires_modules => [],
-           -requires_networking => 0);
-
-is(1,1,"an example test");
-
+test_begin(-tests => 25);
 
 # Make a subclass to test:
 push @ATestClass::ISA, 'Bio::Tools::Run::WrapperBase::Accessor';
