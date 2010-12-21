@@ -1,0 +1,29 @@
+Subclass of Bio::Tools::Run::WrapperBase that lets you do something like:
+
+package Bio::Tools::Run::Widget;
+use base 'Bio::Tools::Run::WrapperBase::Accessor';
+
+BEGIN {
+   __PACKAGE__->_register_parameters({
+        		foo => "A description of param foo",
+                        bar => "A description of param bar"
+	});
+}
+
+
+
+
+# And in your code:
+
+my $obj = Bio::Tools::Run::Widget->new(-foo => 1234);
+
+$obj->foo; #=> 1234
+$obj->foo(undef);
+$obj->bar("hello");
+
+$obj->is_valid_parameter('foo'); #=> 1
+$obj->is_valid_parameter('cheesecake'); #=> 0
+
+$obj->valid_parameters; #=> ("bar", "foo");
+
+
