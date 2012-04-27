@@ -10,7 +10,7 @@ Do not attempt to directly instantiate objects from this class.
 Use the appropriate subclass.
 
  package Bio::Tools::Run::atool;
- use base 'Bio::Tools::Run::rapperBase::Accessor';
+ use base 'Bio::Tools::Run::WrapperBase::Accessor';
  
  BEGIN {
     my $Parameters = {foo => "a description of foo", 
@@ -85,14 +85,12 @@ sub _setup{
 
     my $is_valid_parameter = sub {
       my ($self, $p) = @_;
-      $p = lc($p); # Because _rearrange lets you specify params in uc, lc or a mix
       my %ps = %$params;
       return exists $ps{$p};
     };
 
     my $is_valid_switch = sub {
       my ($self, $s) = @_;
-      $s = lc($s); 
       my %ss = %$swtchs;
       return exists $ss{$s};
     };
@@ -152,14 +150,17 @@ sub new {
   bless $self, $class;
 
   # Bioperl standards say to use _rearrange
-  my @params = map {uc($_)} ($self->valid_parameters, $self->valid_switches);
+  my @params = ($self->valid_parameters, $self->valid_switches);
   my @values = $self->_rearrange(\@params, @_);
-  
+
+  #rearrange appears to uc the params sometimes. urgh.
+  @params = ($self->valid_parameters, $self->valid_switches);
+
   foreach (@params){
-    my $param = lc $_;
     my $val = shift @values;
-    $self->$param($val) if $val;
+    $self->$_($val) if $val;
   }
+
   return $self;
 }
 
@@ -179,8 +180,9 @@ sub new {
 
 sub parameter_string {
   my $self = shift;
-  my @defined_params = grep {defined $self->$_} $self->valid_parameters;
-  my @defined_switches = grep {defined $self->$_} $self->valid_switches;
+
+  my @defined_params = grep { defined $self->$_ } $self->valid_parameters;
+  my @defined_switches = grep { defined $self->$_ } $self->valid_switches;
 
   # use the wrapperbase _setparams helper.
   my $string = $self->_setparams(-params => \@defined_params,
